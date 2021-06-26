@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 
+
+
 pragma solidity ^0.6.11;
 pragma experimental ABIEncoderV2;
 
@@ -12,6 +14,8 @@ import "../deps/@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgrade
 import "../interfaces/badger/IController.sol";
 
 import "../interfaces/compound/CToken.sol";
+import "../interfaces/compound/CErc20.sol";
+
 
 
 import {
@@ -103,10 +107,35 @@ contract MyStrategy is BaseStrategy {
     }
 
 
+
+
     /// @dev invest the amount of want
     /// @notice When this function is called, the controller has already sent want to this
     /// @notice Just get the current balance and then invest accordingly
-    function _deposit(uint256 _amount) internal override {
+    function _deposit( uint256 _amount) internal override {
+         // Create a reference to the underlying asset contract, like DAI.
+        //Erc20 underlying = Erc20(_erc20Contract); this will be want for us
+
+        // Create a reference to the corresponding cToken contract, like cDAI
+       // CErc20 cToken = CErc20(_cErc20Contract);
+
+        // Amount of current exchange rate from cToken to underlying
+        uint256 exchangeRateMantissa = cToken.exchangeRateCurrent();
+        emit MyLog("Exchange Rate (scaled up): ", exchangeRateMantissa);
+
+        // Amount added to you supply balance this block
+        uint256 supplyRateMantissa = cToken.supplyRatePerBlock();
+        emit MyLog("Supply Rate: (scaled up)", supplyRateMantissa);
+
+        // Approve transfer on the ERC20 contract
+        want.approve(_cErc20Contract, _numTokensToSupply);
+
+        // Mint cTokens
+        uint mintResult = cToken.mint(_numTokensToSupply);
+        // return mintResult;
+
+        emit MyLog("This is how much is minted", mintResult);
+
     }
 
     /// @dev utility function to withdraw everything for migration

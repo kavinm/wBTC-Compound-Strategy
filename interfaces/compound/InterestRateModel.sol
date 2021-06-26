@@ -4,7 +4,7 @@ pragma solidity ^0.6.11;
  * @title Compound's InterestRateModel Interface
  * @author Compound
  */
-contract InterestRateModel {
+abstract contract InterestRateModel {
     /// @notice Indicator that this is an InterestRateModel contract (for inspection)
     bool public constant isInterestRateModel = true;
 
@@ -19,7 +19,7 @@ contract InterestRateModel {
         uint256 cash,
         uint256 borrows,
         uint256 reserves
-    ) external view returns (uint256);
+    ) external view virtual returns (uint256);
 
     /**
      * @notice Calculates the current supply interest rate per block
@@ -34,5 +34,5 @@ contract InterestRateModel {
         uint256 borrows,
         uint256 reserves,
         uint256 reserveFactorMantissa
-    ) external view returns (uint256);
+    ) external view virtual returns (uint256);
 }

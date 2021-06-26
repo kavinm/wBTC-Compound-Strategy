@@ -4,7 +4,7 @@ import "./ComptrollerInterface.sol";
 import "./InterestRateModel.sol";
 import "./EIP20NonStandardInterface.sol";
 
-contract CTokenStorage {
+abstract contract CTokenStorage {
     /**
      * @dev Guard variable for re-entrancy checks
      */
@@ -117,7 +117,7 @@ contract CTokenStorage {
     mapping(address => BorrowSnapshot) internal accountBorrows;
 }
 
-contract CTokenInterface is CTokenStorage {
+abstract contract CTokenInterface is CTokenStorage {
     /**
      * @notice Indicator that this is a CToken contract (for inspection)
      */
@@ -252,28 +252,39 @@ contract CTokenInterface is CTokenStorage {
 
     /*** User Interface ***/
 
-    function transfer(address dst, uint256 amount) external returns (bool);
+    function transfer(address dst, uint256 amount)
+        external
+        virtual
+        returns (bool);
 
     function transferFrom(
         address src,
         address dst,
         uint256 amount
-    ) external returns (bool);
+    ) external virtual returns (bool);
 
-    function approve(address spender, uint256 amount) external returns (bool);
+    function approve(address spender, uint256 amount)
+        external
+        virtual
+        returns (bool);
 
     function allowance(address owner, address spender)
         external
         view
+        virtual
         returns (uint256);
 
-    function balanceOf(address owner) external view returns (uint256);
+    function balanceOf(address owner) external view virtual returns (uint256);
 
-    function balanceOfUnderlying(address owner) external returns (uint256);
+    function balanceOfUnderlying(address owner)
+        external
+        virtual
+        returns (uint256);
 
     function getAccountSnapshot(address account)
         external
         view
+        virtual
         returns (
             uint256,
             uint256,
@@ -281,50 +292,64 @@ contract CTokenInterface is CTokenStorage {
             uint256
         );
 
-    function borrowRatePerBlock() external view returns (uint256);
+    function borrowRatePerBlock() external view virtual returns (uint256);
 
-    function supplyRatePerBlock() external view returns (uint256);
+    function supplyRatePerBlock() external view virtual returns (uint256);
 
-    function totalBorrowsCurrent() external returns (uint256);
+    function totalBorrowsCurrent() external virtual returns (uint256);
 
-    function borrowBalanceCurrent(address account) external returns (uint256);
+    function borrowBalanceCurrent(address account)
+        external
+        virtual
+        returns (uint256);
 
-    function borrowBalanceStored(address account) public view returns (uint256);
+    function borrowBalanceStored(address account)
+        public
+        view
+        virtual
+        returns (uint256);
 
-    function exchangeRateCurrent() public returns (uint256);
+    function exchangeRateCurrent() public virtual returns (uint256);
 
-    function exchangeRateStored() public view returns (uint256);
+    function exchangeRateStored() public view virtual returns (uint256);
 
-    function getCash() external view returns (uint256);
+    function getCash() external view virtual returns (uint256);
 
-    function accrueInterest() public returns (uint256);
+    function accrueInterest() public virtual returns (uint256);
 
     function seize(
         address liquidator,
         address borrower,
         uint256 seizeTokens
-    ) external returns (uint256);
+    ) external virtual returns (uint256);
 
     /*** Admin Functions ***/
 
     function _setPendingAdmin(address payable newPendingAdmin)
         external
+        virtual
         returns (uint256);
 
-    function _acceptAdmin() external returns (uint256);
+    function _acceptAdmin() external virtual returns (uint256);
 
     function _setComptroller(ComptrollerInterface newComptroller)
         public
+        virtual
         returns (uint256);
 
     function _setReserveFactor(uint256 newReserveFactorMantissa)
         external
+        virtual
         returns (uint256);
 
-    function _reduceReserves(uint256 reduceAmount) external returns (uint256);
+    function _reduceReserves(uint256 reduceAmount)
+        external
+        virtual
+        returns (uint256);
 
     function _setInterestRateModel(InterestRateModel newInterestRateModel)
         public
+        virtual
         returns (uint256);
 }
 
@@ -335,34 +360,41 @@ contract CErc20Storage {
     address public underlying;
 }
 
-contract CErc20Interface is CErc20Storage {
+abstract contract CErc20Interface is CErc20Storage {
     /*** User Interface ***/
 
-    function mint(uint256 mintAmount) external returns (uint256);
+    function mint(uint256 mintAmount) external virtual returns (uint256);
 
-    function redeem(uint256 redeemTokens) external returns (uint256);
+    function redeem(uint256 redeemTokens) external virtual returns (uint256);
 
-    function redeemUnderlying(uint256 redeemAmount) external returns (uint256);
+    function redeemUnderlying(uint256 redeemAmount)
+        external
+        virtual
+        returns (uint256);
 
-    function borrow(uint256 borrowAmount) external returns (uint256);
+    function borrow(uint256 borrowAmount) external virtual returns (uint256);
 
-    function repayBorrow(uint256 repayAmount) external returns (uint256);
+    function repayBorrow(uint256 repayAmount)
+        external
+        virtual
+        returns (uint256);
 
     function repayBorrowBehalf(address borrower, uint256 repayAmount)
         external
+        virtual
         returns (uint256);
 
     function liquidateBorrow(
         address borrower,
         uint256 repayAmount,
         CTokenInterface cTokenCollateral
-    ) external returns (uint256);
+    ) external virtual returns (uint256);
 
-    function sweepToken(EIP20NonStandardInterface token) external;
+    function sweepToken(EIP20NonStandardInterface token) external virtual;
 
     /*** Admin Functions ***/
 
-    function _addReserves(uint256 addAmount) external returns (uint256);
+    function _addReserves(uint256 addAmount) external virtual returns (uint256);
 }
 
 contract CDelegationStorage {
@@ -372,7 +404,7 @@ contract CDelegationStorage {
     address public implementation;
 }
 
-contract CDelegatorInterface is CDelegationStorage {
+abstract contract CDelegatorInterface is CDelegationStorage {
     /**
      * @notice Emitted when implementation is changed
      */
@@ -391,19 +423,19 @@ contract CDelegatorInterface is CDelegationStorage {
         address implementation_,
         bool allowResign,
         bytes memory becomeImplementationData
-    ) public;
+    ) external virtual;
 }
 
-contract CDelegateInterface is CDelegationStorage {
+abstract contract CDelegateInterface is CDelegationStorage {
     /**
      * @notice Called by the delegator on a delegate to initialize it for duty
      * @dev Should revert if any issues arise which make it unfit for delegation
      * @param data The encoded bytes data for any initialization
      */
-    function _becomeImplementation(bytes memory data) public;
+    function _becomeImplementation(bytes memory data) external virtual;
 
     /**
      * @notice Called by the delegator on a delegate to forfeit its responsibility
      */
-    function _resignImplementation() public;
+    function _resignImplementation() external virtual;
 }

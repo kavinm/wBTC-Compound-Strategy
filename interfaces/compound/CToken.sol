@@ -12,7 +12,7 @@ import "./InterestRateModel.sol";
  * @notice Abstract base for CTokens
  * @author Compound
  */
-contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
+abstract contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
     /**
      * @notice Initialize the money market
      * @param comptroller_ The address of the Comptroller
@@ -156,6 +156,8 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      */
     function transfer(address dst, uint256 amount)
         external
+        virtual
+        override
         nonReentrant
         returns (bool)
     {
@@ -175,7 +177,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
         address src,
         address dst,
         uint256 amount
-    ) external nonReentrant returns (bool) {
+    ) external virtual override nonReentrant returns (bool) {
         return
             transferTokens(msg.sender, src, dst, amount) ==
             uint256(Error.NO_ERROR);
@@ -189,7 +191,12 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @param amount The number of tokens that are approved (-1 means infinite)
      * @return Whether or not the approval succeeded
      */
-    function approve(address spender, uint256 amount) external returns (bool) {
+    function approve(address spender, uint256 amount)
+        external
+        virtual
+        override
+        returns (bool)
+    {
         address src = msg.sender;
         transferAllowances[src][spender] = amount;
         emit Approval(src, spender, amount);
@@ -205,6 +212,8 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
     function allowance(address owner, address spender)
         external
         view
+        virtual
+        override
         returns (uint256)
     {
         return transferAllowances[owner][spender];
@@ -215,7 +224,13 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @param owner The address of the account to query
      * @return The number of tokens owned by `owner`
      */
-    function balanceOf(address owner) external view returns (uint256) {
+    function balanceOf(address owner)
+        external
+        view
+        virtual
+        override
+        returns (uint256)
+    {
         return accountTokens[owner];
     }
 
@@ -225,7 +240,12 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @param owner The address of the account to query
      * @return The amount of underlying owned by `owner`
      */
-    function balanceOfUnderlying(address owner) external returns (uint256) {
+    function balanceOfUnderlying(address owner)
+        external
+        virtual
+        override
+        returns (uint256)
+    {
         Exp memory exchangeRate = Exp({mantissa: exchangeRateCurrent()});
         (MathError mErr, uint256 balance) =
             mulScalarTruncate(exchangeRate, accountTokens[owner]);
@@ -242,6 +262,8 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
     function getAccountSnapshot(address account)
         external
         view
+        virtual
+        override
         returns (
             uint256,
             uint256,
@@ -285,7 +307,13 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @notice Returns the current per-block borrow interest rate for this cToken
      * @return The borrow interest rate per block, scaled by 1e18
      */
-    function borrowRatePerBlock() external view returns (uint256) {
+    function borrowRatePerBlock()
+        external
+        view
+        virtual
+        override
+        returns (uint256)
+    {
         return
             interestRateModel.getBorrowRate(
                 getCashPrior(),
@@ -298,7 +326,13 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @notice Returns the current per-block supply interest rate for this cToken
      * @return The supply interest rate per block, scaled by 1e18
      */
-    function supplyRatePerBlock() external view returns (uint256) {
+    function supplyRatePerBlock()
+        external
+        view
+        virtual
+        override
+        returns (uint256)
+    {
         return
             interestRateModel.getSupplyRate(
                 getCashPrior(),
@@ -312,7 +346,13 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @notice Returns the current total borrows plus accrued interest
      * @return The total borrows with interest
      */
-    function totalBorrowsCurrent() external nonReentrant returns (uint256) {
+    function totalBorrowsCurrent()
+        external
+        virtual
+        override
+        nonReentrant
+        returns (uint256)
+    {
         require(
             accrueInterest() == uint256(Error.NO_ERROR),
             "accrue interest failed"
@@ -327,6 +367,8 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      */
     function borrowBalanceCurrent(address account)
         external
+        virtual
+        override
         nonReentrant
         returns (uint256)
     {
@@ -345,6 +387,8 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
     function borrowBalanceStored(address account)
         public
         view
+        virtual
+        override
         returns (uint256)
     {
         (MathError err, uint256 result) = borrowBalanceStoredInternal(account);
@@ -406,7 +450,13 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @notice Accrue interest then return the up-to-date exchange rate
      * @return Calculated exchange rate scaled by 1e18
      */
-    function exchangeRateCurrent() public nonReentrant returns (uint256) {
+    function exchangeRateCurrent()
+        public
+        virtual
+        override
+        nonReentrant
+        returns (uint256)
+    {
         require(
             accrueInterest() == uint256(Error.NO_ERROR),
             "accrue interest failed"
@@ -419,7 +469,13 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @dev This function does not accrue interest before calculating the exchange rate
      * @return Calculated exchange rate scaled by 1e18
      */
-    function exchangeRateStored() public view returns (uint256) {
+    function exchangeRateStored()
+        public
+        view
+        virtual
+        override
+        returns (uint256)
+    {
         (MathError err, uint256 result) = exchangeRateStoredInternal();
         require(
             err == MathError.NO_ERROR,
@@ -480,7 +536,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @notice Get cash balance of this cToken in the underlying asset
      * @return The quantity of underlying asset owned by this contract
      */
-    function getCash() external view returns (uint256) {
+    function getCash() external view virtual override returns (uint256) {
         return getCashPrior();
     }
 
@@ -489,7 +545,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @dev This calculates interest accrued from the last checkpointed block
      *   up to the current block and writes new checkpoint to storage.
      */
-    function accrueInterest() public returns (uint256) {
+    function accrueInterest() public virtual override returns (uint256) {
         /* Remember the initial block number */
         uint256 currentBlockNumber = getBlockNumber();
         uint256 accrualBlockNumberPrior = accrualBlockNumber;
@@ -1559,7 +1615,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
         address liquidator,
         address borrower,
         uint256 seizeTokens
-    ) external nonReentrant returns (uint256) {
+    ) external virtual override nonReentrant returns (uint256) {
         return seizeInternal(msg.sender, liquidator, borrower, seizeTokens);
     }
 
@@ -1669,6 +1725,8 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      */
     function _setPendingAdmin(address payable newPendingAdmin)
         external
+        virtual
+        override
         returns (uint256)
     {
         // Check caller = admin
@@ -1697,7 +1755,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @dev Admin function for pending admin to accept role and update admin
      * @return uint 0=success, otherwise a failure (see ErrorReporter.sol for details)
      */
-    function _acceptAdmin() external returns (uint256) {
+    function _acceptAdmin() external virtual override returns (uint256) {
         // Check caller is pendingAdmin and pendingAdmin ≠ address(0)
         if (msg.sender != pendingAdmin || msg.sender == address(0)) {
             return
@@ -1730,6 +1788,8 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      */
     function _setComptroller(ComptrollerInterface newComptroller)
         public
+        virtual
+        override
         returns (uint256)
     {
         // Check caller is admin
@@ -1761,6 +1821,8 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      */
     function _setReserveFactor(uint256 newReserveFactorMantissa)
         external
+        virtual
+        override
         nonReentrant
         returns (uint256)
     {
@@ -1913,6 +1975,8 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      */
     function _reduceReserves(uint256 reduceAmount)
         external
+        virtual
+        override
         nonReentrant
         returns (uint256)
     {
@@ -2005,6 +2069,8 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      */
     function _setInterestRateModel(InterestRateModel newInterestRateModel)
         public
+        virtual
+        override
         returns (uint256)
     {
         uint256 error = accrueInterest();
@@ -2079,7 +2145,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      * @dev This excludes the value of the current message, if any
      * @return The quantity of underlying owned by this contract
      */
-    function getCashPrior() internal view returns (uint256);
+    function getCashPrior() internal view virtual returns (uint256);
 
     /**
      * @dev Performs a transfer in, reverting upon failure. Returns the amount actually transferred to the protocol, in case of a fee.
@@ -2087,6 +2153,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      */
     function doTransferIn(address from, uint256 amount)
         internal
+        virtual
         returns (uint256);
 
     /**
@@ -2094,7 +2161,7 @@ contract CToken is CTokenInterface, Exponential, TokenErrorReporter {
      *  If caller has not called checked protocol's balance, may revert due to insufficient cash held in the contract.
      *  If caller has checked protocol's balance, and verified it is >= amount, this should not revert in normal conditions.
      */
-    function doTransferOut(address payable to, uint256 amount) internal;
+    function doTransferOut(address payable to, uint256 amount) internal virtual;
 
     /*** Reentrancy Guard ***/
 

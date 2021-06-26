@@ -2,6 +2,7 @@ pragma solidity ^0.6.11;
 
 import "./CToken.sol";
 
+// SPDX-License-Identifier: MIT
 /**
  * @title Compound's CErc20 Contract
  * @notice CTokens which wrap an EIP-20 underlying

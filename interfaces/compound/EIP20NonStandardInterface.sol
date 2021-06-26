@@ -1,5 +1,6 @@
 pragma solidity ^0.6.11;
 
+// SPDX-License-Identifier: MIT
 /**
  * @title EIP20NonStandardInterface
  * @dev Version of ERC20 with no return values for `transfer` and `transferFrom`

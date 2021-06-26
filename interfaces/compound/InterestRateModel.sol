@@ -1,5 +1,6 @@
 pragma solidity ^0.6.11;
 
+// SPDX-License-Identifier: MIT
 /**
  * @title Compound's InterestRateModel Interface
  * @author Compound

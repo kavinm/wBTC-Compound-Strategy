@@ -7,6 +7,7 @@ import "./Exponential.sol";
 import "./EIP20Interface.sol";
 import "./InterestRateModel.sol";
 
+// SPDX-License-Identifier: MIT
 /**
  * @title Compound's CToken Contract
  * @notice Abstract base for CTokens

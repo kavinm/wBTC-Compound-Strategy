@@ -4,6 +4,7 @@ import "./ComptrollerInterface.sol";
 import "./InterestRateModel.sol";
 import "./EIP20NonStandardInterface.sol";
 
+// SPDX-License-Identifier: MIT
 abstract contract CTokenStorage {
     /**
      * @dev Guard variable for re-entrancy checks

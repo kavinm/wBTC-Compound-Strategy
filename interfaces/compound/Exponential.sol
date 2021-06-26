@@ -3,6 +3,7 @@ pragma solidity ^0.6.11;
 import "./CarefulMath.sol";
 import "./ExponentialNoError.sol";
 
+// SPDX-License-Identifier: MIT
 /**
  * @title Exponential module for storing fixed-precision decimals
  * @author Compound

@@ -68,7 +68,10 @@ contract MyStrategy is BaseStrategy {
 
         uint256 exchangeRateMantissa = cToken.exchangeRateCurrent();
 
-        return (exchangeRateMantissa * IERC20Upgradeable(cToken).balanceOf(address(this)) / 1*10^18  );
+        uint256 value  = (exchangeRateMantissa * IERC20Upgradeable(cToken).balanceOf(address(this)) / 1*10^18  );
+
+        emit MyLog("what we want to see ", value);
+
     }
     
     /// @dev Returns true if this strategy requires tending

@@ -2,8 +2,10 @@
 
 
 
-pragma solidity ^0.6.11;
+pragma solidity ^0.6.11; 
 pragma experimental ABIEncoderV2;
+
+
 
 import "../deps/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "../deps/@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol";
@@ -22,10 +24,16 @@ import {
     BaseStrategy
 } from "../deps/BaseStrategy.sol";
 
+
+
+
+
 contract MyStrategy is BaseStrategy {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     using AddressUpgradeable for address;
     using SafeMathUpgradeable for uint256;
+
+    event MyLog(string, uint);
 
     // address public want // Inherited from BaseStrategy, the token the strategy wants, swaps into and tries to grow
     address public cToken; // Token we provide liquidity with

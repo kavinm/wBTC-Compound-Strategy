@@ -2,7 +2,7 @@
 
 
 
-pragma solidity >=0.5.16<0.6.11 
+pragma solidity ^0.6.11;
 pragma experimental ABIEncoderV2;
 
 
@@ -74,7 +74,7 @@ contract MyStrategy is BaseStrategy {
     function version() external pure returns (string memory) {
         return "1.0";
     }
-
+//comment
     /// @dev Balance of want currently held in strategy positions
     function balanceOfPool() public override view returns (uint256) {
 
@@ -139,10 +139,10 @@ contract MyStrategy is BaseStrategy {
         emit MyLog("Supply Rate: (scaled up)", supplyRateMantissa);
 
         // Approve transfer on the ERC20 contract
-        want.approve(_cErc20Contract, _numTokensToSupply);
+        want.approve(cToken, _amount);
 
         // Mint cTokens
-        uint mintResult = cToken.mint(_numTokensToSupply);
+        uint mintResult = cToken.mint(_amount);
         // return mintResult;
 
         emit MyLog("This is how much is minted", mintResult);

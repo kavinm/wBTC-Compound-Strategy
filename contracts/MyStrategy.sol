@@ -11,6 +11,8 @@ import "../deps/@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgrade
 
 import "../interfaces/badger/IController.sol";
 
+import "../interfaces/compound/CToken.sol";
+
 
 import {
     BaseStrategy
@@ -63,7 +65,10 @@ contract MyStrategy is BaseStrategy {
 
     /// @dev Balance of want currently held in strategy positions
     function balanceOfPool() public override view returns (uint256) {
-        return 0;
+
+        uint256 exchangeRateMantissa = cToken.exchangeRateCurrent();
+
+        return (exchangeRateMantissa * IERC20Upgradeable(cToken).balanceOf(address(this)) / 1*10^18  );
     }
     
     /// @dev Returns true if this strategy requires tending

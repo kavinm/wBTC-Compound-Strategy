@@ -22,8 +22,8 @@ contract MyStrategy is BaseStrategy {
     using SafeMathUpgradeable for uint256;
 
     // address public want // Inherited from BaseStrategy, the token the strategy wants, swaps into and tries to grow
-    address public lpComponent; // Token we provide liquidity with
-    address public reward; // Token we farm and swap to want / lpComponent
+    address public cToken; // Token we provide liquidity with
+    address public reward; // Token we farm and swap to want / cToken
 
     function initialize(
         address _governance,
@@ -38,7 +38,7 @@ contract MyStrategy is BaseStrategy {
 
         /// @dev Add config here
         want = _wantConfig[0];
-        lpComponent = _wantConfig[1];
+        cToken = _wantConfig[1];
         reward = _wantConfig[2];
 
         performanceFeeGovernance = _feeConfig[0];
@@ -75,7 +75,7 @@ contract MyStrategy is BaseStrategy {
     function getProtectedTokens() public override view returns (address[] memory) {
         address[] memory protectedTokens = new address[](3);
         protectedTokens[0] = want;
-        protectedTokens[1] = lpComponent;
+        protectedTokens[1] = cToken;
         protectedTokens[2] = reward;
         return protectedTokens;
     }
@@ -107,7 +107,7 @@ contract MyStrategy is BaseStrategy {
     /// @dev utility function to withdraw everything for migration
     function _withdrawAll() internal override {
     }
-    /// @dev withdraw the specified amount of want, liquidate from lpComponent to want, paying off any necessary debt for the conversion
+    /// @dev withdraw the specified amount of want, liquidate from cToken to want, paying off any necessary debt for the conversion
     function _withdrawSome(uint256 _amount) internal override returns (uint256) {
 
         return _amount;

@@ -40,12 +40,8 @@ contract MyStrategy is BaseStrategy {
     address public lpComponent; // Token we provide liquidity with
     address public reward; // Token we farm and swap to want / lpComponent
 
-
-    CErc20 cToken = CErc20(lpComponent); //cToken object for cwBTC
-
-    uint256 exchangeRateMantissa = cToken.exchangeRateCurrent(); //exchange rate for cwBTC 
-
-    Erc20 underlying = Erc20(want); //Erc20 object for wBTC
+   
+    
 
     function initialize(
         address _governance,
@@ -54,7 +50,12 @@ contract MyStrategy is BaseStrategy {
         address _keeper,
         address _guardian,
         address[3] memory _wantConfig,
-        uint256[3] memory _feeConfig
+        uint256[3] memory _feeConfig,
+        CErc20 cToken,
+        uint256 exchangeRateMantissa,
+        Erc20 underlying
+
+
     ) public initializer {
         __BaseStrategy_init(_governance, _strategist, _controller, _keeper, _guardian);
 
@@ -66,6 +67,12 @@ contract MyStrategy is BaseStrategy {
         performanceFeeGovernance = _feeConfig[0];
         performanceFeeStrategist = _feeConfig[1];
         withdrawalFee = _feeConfig[2];
+
+       cToken = CErc20(lpComponent); //cToken object for cwBTC
+
+         exchangeRateMantissa = cToken.exchangeRateCurrent(); //exchange rate for cwBTC 
+
+         underlying = Erc20(want); //Erc20 object for wBTC
 
         /// @dev do one off approvals here
         // IERC20Upgradeable(want).safeApprove(gauge, type(uint256).max);
@@ -84,10 +91,10 @@ contract MyStrategy is BaseStrategy {
     }
 //comment
     /// @dev Balance of want currently held in strategy positions
-    function balanceOfPool() public override view returns (uint256) {
+    function balanceOfPool() public override view  returns (uint256) {
 
         
-
+        return 0;
         uint256 value  = (exchangeRateMantissa * IERC20Upgradeable(lpComponent).balanceOf(address(this)) / 1*10^18  );
 
         //emit MyLog("what we want to see ", value);
@@ -144,37 +151,37 @@ contract MyStrategy is BaseStrategy {
 
         // Amount of current exchange rate from lpComponent to underlying
        
-        emit MyLog("Exchange Rate (scaled up): ", exchangeRateMantissa);
+        // emit MyLog("Exchange Rate (scaled up): ", exchangeRateMantissa);
 
-        // Amount added to you supply balance this block
-        //uint256 supplyRateMantissa = cToken.supplyRatePerBlock();
-        //emit MyLog("Supply Rate: (scaled up)", supplyRateMantissa);
+        // // Amount added to you supply balance this block
+        // //uint256 supplyRateMantissa = cToken.supplyRatePerBlock();
+        // //emit MyLog("Supply Rate: (scaled up)", supplyRateMantissa);
 
-        // Approve transfer on the ERC20 contract
-        underlying.approve(lpComponent, _amount);
+        // // Approve transfer on the ERC20 contract
+        // underlying.approve(lpComponent, _amount);
 
-        // Mint lpComponents
-        uint mintResult = cToken.mint(_amount);
-        // return mintResult;
+        // // Mint lpComponents
+        // uint mintResult = cToken.mint(_amount);
+        // // return mintResult;
 
-        emit MyLog("This is how much is minted", mintResult);
+        // emit MyLog("This is how much is minted", mintResult);
 
     }
 
     /// @dev utility function to withdraw everything for migration
     function _withdrawAll() internal override {
-        cToken.redeem(balanceOfPool());
+        // cToken.redeem(balanceOfPool());
     }
 
 
     /// @dev withdraw the specified amount of want, liquidate from lpComponent to want, paying off any necessary debt for the conversion
     function _withdrawSome(uint256 _amount) internal override returns (uint256) {
 
-        if (_amount > balanceOfPool()) { 
-            _amount = balanceOfPool();
-        }
+        // if (_amount > balanceOfPool()) { 
+        //     _amount = balanceOfPool();
+        // }
         
-        cToken.redeemUnderlying(_amount);
+        // cToken.redeemUnderlying(_amount);
         return _amount;
     }
 

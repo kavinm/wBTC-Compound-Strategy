@@ -16,7 +16,7 @@ import "../deps/@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgrade
 import "../interfaces/badger/IController.sol";
 
 import "../interfaces/compound/CToken.sol";
-import "../interfaces/compound/CErc20.sol";
+
 
 
 

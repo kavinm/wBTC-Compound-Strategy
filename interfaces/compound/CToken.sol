@@ -14,8 +14,8 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 //
 // SPDX-License-Identifier: LGPL-3.0-only
-
-pragma solidity 0.7.3;
+//it was supposed to be redeemAmount as a parameter for redeemUnderlying and uint paramters were made uint256
+pragma solidity ^0.6.11;
 
 /**
  * @dev CToken contract interface.
@@ -23,6 +23,7 @@ pragma solidity 0.7.3;
  * github.com/compound-finance/compound-protocol/blob/master/contracts/CToken.sol.
  */
 interface CToken {
+    
     function borrowBalanceCurrent(address) external returns (uint256);
 
     function exchangeRateCurrent() external returns (uint256);
@@ -30,6 +31,8 @@ interface CToken {
     function mint(uint256) external returns (uint256);
 
     function redeem(uint256) external returns (uint256);
+
+    function redeemUnderlying(uint256 ) external returns (uint256); 
 
     function borrowBalanceStored(address) external view returns (uint256);
 

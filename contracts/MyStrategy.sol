@@ -97,7 +97,7 @@ contract MyStrategy is BaseStrategy {
     function balanceOfPool() public override view  returns (uint256) {
 
         
-        return 0;
+        //return 0;
         uint256 value  = (exchangeRateMantissa * IERC20Upgradeable(lpComponent).balanceOf(address(this)) / 1*10^18  );
 
         //emit MyLog("what we want to see ", value);
@@ -145,27 +145,23 @@ contract MyStrategy is BaseStrategy {
     /// @notice Just get the current balance and then invest accordingly
     function _deposit( uint256 _amount) internal override {
          // Create a reference to the underlying asset contract, like DAI.
-        //Erc20 underlying = Erc20(_erc20Contract); this will be want for us
+       
 
         // Create a reference to the corresponding lpComponent contract, like cDAI
-        
-
 
 
         // Amount of current exchange rate from lpComponent to underlying
        
         // emit MyLog("Exchange Rate (scaled up): ", exchangeRateMantissa);
 
-        // // Amount added to you supply balance this block
-        // //uint256 supplyRateMantissa = cToken.supplyRatePerBlock();
-        // //emit MyLog("Supply Rate: (scaled up)", supplyRateMantissa);
+        
 
-        // // Approve transfer on the ERC20 contract
-        // underlying.approve(lpComponent, _amount);
+        // Approve transfer on the ERC20 contract
+        underlying.approve(lpComponent, _amount);
 
-        // // Mint lpComponents
-        // uint mintResult = cToken.mint(_amount);
-        // // return mintResult;
+        // Mint lpComponents
+        uint mintResult = cToken.mint(_amount);
+        // return mintResult;
 
         // emit MyLog("This is how much is minted", mintResult);
 

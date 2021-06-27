@@ -39,7 +39,9 @@ contract MyStrategy is BaseStrategy {
    // address public want; // Inherited from BaseStrategy, the token the strategy wants, swaps into and tries to grow
     address public lpComponent; // Token we provide liquidity with
     address public reward; // Token we farm and swap to want / lpComponent
-
+    CErc20 cToken;
+    uint256 exchangeRateMantissa;
+    Erc20 underlying;
    
     
 
@@ -51,9 +53,8 @@ contract MyStrategy is BaseStrategy {
         address _guardian,
         address[3] memory _wantConfig,
         uint256[3] memory _feeConfig,
-        CErc20 cToken,
-        uint256 exchangeRateMantissa,
-        Erc20 underlying
+       
+       
 
 
     ) public initializer {
@@ -77,6 +78,8 @@ contract MyStrategy is BaseStrategy {
         /// @dev do one off approvals here
         // IERC20Upgradeable(want).safeApprove(gauge, type(uint256).max);
     }
+
+
 
     /// ===== View Functions =====
 

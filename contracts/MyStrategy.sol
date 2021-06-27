@@ -15,7 +15,8 @@ import "../deps/@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgrade
 
 import "../interfaces/badger/IController.sol";
 
-import "../interfaces/compound/lpComponent.sol";
+import "../interfaces/erc20/Erc20.sol";
+import "../interfaces/compound/CErc20.sol";
 
 
 
@@ -38,6 +39,13 @@ contract MyStrategy is BaseStrategy {
    // address public want; // Inherited from BaseStrategy, the token the strategy wants, swaps into and tries to grow
     address public lpComponent; // Token we provide liquidity with
     address public reward; // Token we farm and swap to want / lpComponent
+
+
+    CErc20 cToken = CErc20(lpComponent); //cToken object for cwBTC
+
+    uint256 exchangeRateMantissa = cToken.exchangeRateCurrent(); //exchange rate for cwBTC 
+
+    Erc20 underlying = Erc20(want); //Erc20 object for wBTC
 
     function initialize(
         address _governance,
@@ -79,11 +87,12 @@ contract MyStrategy is BaseStrategy {
     function balanceOfPool() public override view returns (uint256) {
 
         
-        uint256 exchangeRateMantissa = lpComponent(0xC11b1268C1A384e55C48c2391d8d480264A3A7F4).exchangeRateCurrent();
 
         uint256 value  = (exchangeRateMantissa * IERC20Upgradeable(lpComponent).balanceOf(address(this)) / 1*10^18  );
 
-        emit MyLog("what we want to see ", value);
+        //emit MyLog("what we want to see ", value);
+
+        return value;
 
     }
     
@@ -129,21 +138,23 @@ contract MyStrategy is BaseStrategy {
         //Erc20 underlying = Erc20(_erc20Contract); this will be want for us
 
         // Create a reference to the corresponding lpComponent contract, like cDAI
-       //CErc20 lpComponent = CErc20(_cErc20Contract);
+        
+
+
 
         // Amount of current exchange rate from lpComponent to underlying
-        uint256 exchangeRateMantissa = lpComponent.exchangeRateCurrent();
+       
         emit MyLog("Exchange Rate (scaled up): ", exchangeRateMantissa);
 
         // Amount added to you supply balance this block
-        uint256 supplyRateMantissa = lpComponent.supplyRatePerBlock();
-        emit MyLog("Supply Rate: (scaled up)", supplyRateMantissa);
+        //uint256 supplyRateMantissa = cToken.supplyRatePerBlock();
+        //emit MyLog("Supply Rate: (scaled up)", supplyRateMantissa);
 
         // Approve transfer on the ERC20 contract
-        want.approve(lpComponent, _amount);
+        underlying.approve(lpComponent, _amount);
 
         // Mint lpComponents
-        uint mintResult = lpComponent.mint(_amount);
+        uint mintResult = cToken.mint(_amount);
         // return mintResult;
 
         emit MyLog("This is how much is minted", mintResult);

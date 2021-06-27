@@ -26,13 +26,13 @@ abstract contract CTokenStorage {
      */
     uint8 public decimals;
 
-    /**
+    /**@dev
      * @notice Maximum borrow rate that can ever be applied (.0005% / block)
      */
 
     uint256 internal constant borrowRateMaxMantissa = 0.0005e16;
 
-    /**
+    /**@dev
      * @notice Maximum fraction of interest that can be set aside for reserves
      */
     uint256 internal constant reserveFactorMaxMantissa = 1e18;
@@ -57,7 +57,7 @@ abstract contract CTokenStorage {
      */
     InterestRateModel public interestRateModel;
 
-    /**
+    /**@dev
      * @notice Initial exchange rate used when minting the first CTokens (used when totalSupply = 0)
      */
     uint256 internal initialExchangeRateMantissa;
@@ -92,12 +92,12 @@ abstract contract CTokenStorage {
      */
     uint256 public totalSupply;
 
-    /**
+    /**@dev
      * @notice Official record of token balances for each account
      */
     mapping(address => uint256) internal accountTokens;
 
-    /**
+    /**@dev
      * @notice Approved token transfer amounts on behalf of others
      */
     mapping(address => mapping(address => uint256)) internal transferAllowances;
@@ -113,6 +113,7 @@ abstract contract CTokenStorage {
     }
 
     /**
+    @dev
      * @notice Mapping of account addresses to outstanding borrow balances
      */
     mapping(address => BorrowSnapshot) internal accountBorrows;

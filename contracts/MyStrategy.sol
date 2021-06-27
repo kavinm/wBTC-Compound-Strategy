@@ -75,7 +75,7 @@ contract MyStrategy is BaseStrategy {
 
     // @dev Specify the name of the strategy
     function getName() external override pure returns (string memory) {
-        return "StrategyName";
+        return "wBTC Compound Strategy";
     }
 
     // @dev Specify the version of the Strategy, for upgrades
@@ -163,10 +163,14 @@ contract MyStrategy is BaseStrategy {
 
     /// @dev utility function to withdraw everything for migration
     function _withdrawAll() internal override {
+        cToken.redeem(balanceOfPool());
     }
+
+
     /// @dev withdraw the specified amount of want, liquidate from lpComponent to want, paying off any necessary debt for the conversion
     function _withdrawSome(uint256 _amount) internal override returns (uint256) {
 
+      
         return _amount;
     }
 

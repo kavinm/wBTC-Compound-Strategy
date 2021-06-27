@@ -15,7 +15,7 @@ import "../deps/@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgrade
 
 import "../interfaces/badger/IController.sol";
 
-import "../interfaces/compound/CToken.sol";
+import "../interfaces/compound/lpComponent.sol";
 
 
 
@@ -36,8 +36,8 @@ contract MyStrategy is BaseStrategy {
     event MyLog(string, uint);
 
    // address public want; // Inherited from BaseStrategy, the token the strategy wants, swaps into and tries to grow
-    address public cToken; // Token we provide liquidity with
-    address public reward; // Token we farm and swap to want / cToken
+    address public lpComponent; // Token we provide liquidity with
+    address public reward; // Token we farm and swap to want / lpComponent
 
     function initialize(
         address _governance,
@@ -52,7 +52,7 @@ contract MyStrategy is BaseStrategy {
 
         /// @dev Add config here
         want = _wantConfig[0];
-        cToken = _wantConfig[1];
+        lpComponent = _wantConfig[1];
         reward = _wantConfig[2];
 
         performanceFeeGovernance = _feeConfig[0];
@@ -78,9 +78,10 @@ contract MyStrategy is BaseStrategy {
     /// @dev Balance of want currently held in strategy positions
     function balanceOfPool() public override view returns (uint256) {
 
-        uint256 exchangeRateMantissa = CToken(0xC11b1268C1A384e55C48c2391d8d480264A3A7F4).exchangeRateCurrent();
+        
+        uint256 exchangeRateMantissa = lpComponent(0xC11b1268C1A384e55C48c2391d8d480264A3A7F4).exchangeRateCurrent();
 
-        uint256 value  = (exchangeRateMantissa * IERC20Upgradeable(cToken).balanceOf(address(this)) / 1*10^18  );
+        uint256 value  = (exchangeRateMantissa * IERC20Upgradeable(lpComponent).balanceOf(address(this)) / 1*10^18  );
 
         emit MyLog("what we want to see ", value);
 
@@ -95,7 +96,7 @@ contract MyStrategy is BaseStrategy {
     function getProtectedTokens() public override view returns (address[] memory) {
         address[] memory protectedTokens = new address[](3);
         protectedTokens[0] = want;
-        protectedTokens[1] = cToken;
+        protectedTokens[1] = lpComponent;
         protectedTokens[2] = reward;
         return protectedTokens;
     }
@@ -127,22 +128,22 @@ contract MyStrategy is BaseStrategy {
          // Create a reference to the underlying asset contract, like DAI.
         //Erc20 underlying = Erc20(_erc20Contract); this will be want for us
 
-        // Create a reference to the corresponding cToken contract, like cDAI
-       // CErc20 cToken = CErc20(_cErc20Contract);
+        // Create a reference to the corresponding lpComponent contract, like cDAI
+       //CErc20 lpComponent = CErc20(_cErc20Contract);
 
-        // Amount of current exchange rate from cToken to underlying
-        uint256 exchangeRateMantissa = cToken.exchangeRateCurrent();
+        // Amount of current exchange rate from lpComponent to underlying
+        uint256 exchangeRateMantissa = lpComponent.exchangeRateCurrent();
         emit MyLog("Exchange Rate (scaled up): ", exchangeRateMantissa);
 
         // Amount added to you supply balance this block
-        uint256 supplyRateMantissa = cToken.supplyRatePerBlock();
+        uint256 supplyRateMantissa = lpComponent.supplyRatePerBlock();
         emit MyLog("Supply Rate: (scaled up)", supplyRateMantissa);
 
         // Approve transfer on the ERC20 contract
-        want.approve(cToken, _amount);
+        want.approve(lpComponent, _amount);
 
-        // Mint cTokens
-        uint mintResult = cToken.mint(_amount);
+        // Mint lpComponents
+        uint mintResult = lpComponent.mint(_amount);
         // return mintResult;
 
         emit MyLog("This is how much is minted", mintResult);
@@ -152,7 +153,7 @@ contract MyStrategy is BaseStrategy {
     /// @dev utility function to withdraw everything for migration
     function _withdrawAll() internal override {
     }
-    /// @dev withdraw the specified amount of want, liquidate from cToken to want, paying off any necessary debt for the conversion
+    /// @dev withdraw the specified amount of want, liquidate from lpComponent to want, paying off any necessary debt for the conversion
     function _withdrawSome(uint256 _amount) internal override returns (uint256) {
 
         return _amount;

@@ -18,12 +18,12 @@
 pragma solidity ^0.6.11;
 
 /**
- * @dev CToken contract interface.
- * The CToken contract is available here
- * github.com/compound-finance/compound-protocol/blob/master/contracts/CToken.sol.
+ * @dev CErc20 contract interface.
+ * The CErc20 contract is available here
+ * github.com/compound-finance/compound-protocol/blob/master/contracts/CErc20.sol.
  */
-interface CToken {
-    
+interface CErc20 {
+
     function borrowBalanceCurrent(address) external returns (uint256);
 
     function exchangeRateCurrent() external returns (uint256);

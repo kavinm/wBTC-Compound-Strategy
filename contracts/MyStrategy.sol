@@ -52,7 +52,7 @@ contract MyStrategy is BaseStrategy {
         address _keeper,
         address _guardian,
         address[3] memory _wantConfig,
-        uint256[3] memory _feeConfig,
+        uint256[3] memory _feeConfig
        
        
 

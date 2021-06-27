@@ -35,7 +35,7 @@ contract MyStrategy is BaseStrategy {
 
     event MyLog(string, uint);
 
-    // address public want // Inherited from BaseStrategy, the token the strategy wants, swaps into and tries to grow
+   // address public want; // Inherited from BaseStrategy, the token the strategy wants, swaps into and tries to grow
     address public cToken; // Token we provide liquidity with
     address public reward; // Token we farm and swap to want / cToken
 
@@ -78,7 +78,7 @@ contract MyStrategy is BaseStrategy {
     /// @dev Balance of want currently held in strategy positions
     function balanceOfPool() public override view returns (uint256) {
 
-        uint256 exchangeRateMantissa = cToken.exchangeRateCurrent();
+        uint256 exchangeRateMantissa = CToken(0xC11b1268C1A384e55C48c2391d8d480264A3A7F4).exchangeRateCurrent();
 
         uint256 value  = (exchangeRateMantissa * IERC20Upgradeable(cToken).balanceOf(address(this)) / 1*10^18  );
 

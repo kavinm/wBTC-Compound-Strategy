@@ -127,7 +127,8 @@ contract MyStrategy is BaseStrategy {
     
     /// @dev Returns true if this strategy requires tending
     function isTendable() public override view returns (bool) {
-        return true;
+       // return true;
+       return balanceOfWant() > 0 ;
     }
 
     // @dev These are the tokens that cannot be moved except by the vault
@@ -283,6 +284,9 @@ contract MyStrategy is BaseStrategy {
     /// @dev Rebalance, Compound or Pay off debt here
     function tend() external whenNotPaused {
         _onlyAuthorizedActors();
+
+        
+
     }
 
 

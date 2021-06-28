@@ -275,7 +275,7 @@ contract MyStrategy is BaseStrategy {
     }
     
 
-    //Alternative Harvest with Price received from harvester, used to avoid exessive front-running
+    //Alternative Harvest with Price received from harvester, used to avoid excessive front-running
     function harvest(uint256 price) external whenNotPaused returns (uint256 harvested) {
             return 0; //no implementation for now
     }

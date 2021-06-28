@@ -285,7 +285,14 @@ contract MyStrategy is BaseStrategy {
     function tend() external whenNotPaused {
         _onlyAuthorizedActors();
 
+        uint256 toDeposit = balanceOfWant();
         
+        if(toDeposit != 0){
+            underlying.approve(lpComponent, toDeposit);
+            uint mintResult = cToken.mint(toDeposit);
+
+
+        }
 
     }
 

@@ -19,6 +19,7 @@ class StrategyResolver(StrategyCoreResolver):
         Specifies extra check for ordinary operation on deposit
         Use this to verify that balances in the get_strategy_destinations are properly set
         """
+        ##nothing specific for deposit rn
         assert True
 
     def hook_after_earn(self, before, after, params):
@@ -26,7 +27,10 @@ class StrategyResolver(StrategyCoreResolver):
         Specifies extra check for ordinary operation on earn
         Use this to verify that balances in the get_strategy_destinations are properly set
         """
-        assert True  # was False
+        # assert True  #was False
+        assert after.balances("want", "lpComponent") > before.balances(
+            "want", "lpComponent"
+        )
 
     def confirm_harvest(self, before, after, tx):
         """

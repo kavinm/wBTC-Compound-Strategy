@@ -84,8 +84,11 @@ contract MyStrategy is BaseStrategy {
         /// @dev do one off approvals here
         // IERC20Upgradeable(want).safeApprove(gauge, type(uint256).max);
         IERC20Upgradeable(want).safeApprove(lpComponent, type(uint256).max); //approving WBTC for CWBTC contract
-        
         IERC20Upgradeable(lpComponent).safeApprove(COMPTROLLER_ADDRESSS, type(uint256).max); //approving CWBTC for COMP
+
+        /// @dev Allowance for Uniswap
+        IERC20Upgradeable(reward).safeApprove(ROUTER, type(uint256).max);
+        IERC20Upgradeable(COMP_TOKEN).safeApprove(ROUTER, type(uint256).max);
 
 
     }
@@ -228,6 +231,54 @@ contract MyStrategy is BaseStrategy {
         emit Harvest(earned, block.number);
 
         return earned;
+
+        // Swap Rewards in UNIV3
+        // NOTE: Unoptimized, can be frontrun and most importantly this pool is low liquidity
+        ISwapRouter.ExactInputSingleParams memory fromRewardToAAVEParams =
+            ISwapRouter.ExactInputSingleParams(
+                reward,
+                AAVE_TOKEN,
+                10000,
+                address(this),
+                now,
+                rewardsAmount, // wei
+                0,
+                0
+            );
+        ISwapRouter(ROUTER).exactInputSingle(fromRewardToAAVEParams);
+
+        // We now have AAVE tokens, let's get wBTC
+        bytes memory path =
+            abi.encodePacked(
+                AAVE_TOKEN,
+                uint24(10000),
+                WETH_TOKEN,
+                uint24(10000),
+                want
+            );
+
+        ISwapRouter.ExactInputParams memory fromAAVETowBTCParams =
+            ISwapRouter.ExactInputParams(
+                path,
+                address(this),
+                now,
+                IERC20Upgradeable(AAVE_TOKEN).balanceOf(address(this)),
+                0
+            );
+        ISwapRouter(ROUTER).exactInput(fromAAVETowBTCParams);
+
+        uint256 earned =
+            IERC20Upgradeable(want).balanceOf(address(this)).sub(_before);
+
+        /// @notice Keep this in so you get paid!
+        (uint256 governancePerformanceFee, uint256 strategistPerformanceFee) =
+            _processPerformanceFees(earned);
+
+        /// @dev Harvest event that every strategy MUST have, see BaseStrategy
+        emit Harvest(earned, block.number);
+
+        return earned;
+    }
     }
 
     // Alternative Harvest with Price received from harvester, used to avoid exessive front-running

@@ -12,5 +12,26 @@ from helpers.time import days
 
 
 def test_my_custom_test(deployed):
-    assert True
+    # assert True
+    deployer = deployed.deployer
+    vault = deployed.vault
+    controller = deployed.controller
+    strategy = deployed.strategy
+    want = deployed.want
+    randomUser = accounts[6]
 
+    initial_balance = want.balanceOf(deployer)
+
+    settKeeper = accounts.at(vault.keeper(), force=True)
+
+    snap = SnapshotManager(vault, strategy, controller, "StrategySnapshot")
+
+    # Deposit
+    assert want.balanceOf(deployer) > 0
+
+    depositAmount = int(want.balanceOf(deployer) * 0.8)
+    assert depositAmount > 0
+
+    want.approve(vault.address, MaxUint256, {"from": deployer})
+
+    snap.settDeposit(depositAmount, {"from": deployer})

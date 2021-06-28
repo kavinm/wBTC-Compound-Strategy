@@ -46,6 +46,8 @@ contract MyStrategy is BaseStrategy {
     Erc20 underlying;
 
     address public constant COMPTROLLER_ADDRESSS = 0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B;
+
+    
    
     
 
@@ -206,6 +208,10 @@ contract MyStrategy is BaseStrategy {
         comptroller.claimComp(address(this));
 
         uint256 rewardsAmount = IERC20Upgradeable(reward).balanceOf(address(this)); //how much comp we got
+
+        if(rewardsAmount == 0){
+            return 0;
+        }
 
 
 

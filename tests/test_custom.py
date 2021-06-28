@@ -35,3 +35,33 @@ def test_my_custom_test(deployed):
     want.approve(vault.address, MaxUint256, {"from": deployer})
 
     snap.settDeposit(depositAmount, {"from": deployer})
+
+
+# def test_balance_of_pool(
+#     deployer, vault, sett, controller, strategy, want, settKeeper, strategyKeeper
+# ):
+#     snap = SnapshotManager(vault, strategy, controller, "StrategySnapshot")
+#     randomUser = accounts[6]
+#     tendable = strategy.isTendable()
+#     startingBalance = want.balanceOf(deployer)
+#     depositAmount = startingBalance // 2
+#     assert startingBalance >= depositAmount
+#     assert startingBalance >= 0
+#     # End Setup
+
+#     # Deposit
+#     want.approve(sett, MaxUint256, {"from": deployer})
+#     snap.settDeposit(depositAmount, {"from": deployer})
+#     shares = vault.balanceOf(deployer)
+
+#     assert want.balanceOf(sett) > 0
+#     print("want.balanceOf(sett)", want.balanceOf(sett))
+
+#     # Earn
+#     snap.settEarn({"from": settKeeper})
+
+#     if tendable:
+#         with brownie.reverts("onlyAuthorizedActors"):
+#             strategy.tend({"from": randomUser})
+
+#         snap.settTend({"from": strategyKeeper})

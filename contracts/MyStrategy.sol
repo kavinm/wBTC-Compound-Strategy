@@ -43,7 +43,7 @@ contract MyStrategy is BaseStrategy {
     address public lpComponent; // Token we provide liquidity with
     address public reward; // Token we farm and swap to want / lpComponent
     CErc20 cToken;
-    uint256 exchangeRateMantissa;
+    
     Erc20 underlying;
 
     address public constant COMPTROLLER_ADDRESSS = 0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B;
@@ -82,7 +82,7 @@ contract MyStrategy is BaseStrategy {
 
        cToken = CErc20(lpComponent); //cToken object for cwBTC
 
-         exchangeRateMantissa = cToken.exchangeRateCurrent(); //exchange rate for cwBTC 
+         
 
          underlying = Erc20(want); //Erc20 object for wBTC
 
@@ -115,7 +115,7 @@ contract MyStrategy is BaseStrategy {
     /// @dev Balance of want currently held in strategy positions
     function balanceOfPool() public override view  returns (uint256) {
 
-        
+        uint256 exchangeRateMantissa = cToken.exchangeRateStored(); //exchange rate for cwBTC 
         //return 0;
         uint256 value  = (exchangeRateMantissa * IERC20Upgradeable(lpComponent).balanceOf(address(this)) / 1*10^18  );
 

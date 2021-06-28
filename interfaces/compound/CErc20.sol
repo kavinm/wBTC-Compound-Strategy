@@ -28,6 +28,8 @@ interface CErc20 {
 
     function exchangeRateCurrent() external returns (uint256);
 
+    function exchangeRateStored() external view returns (uint256);
+
     function mint(uint256) external returns (uint256);
 
     function redeem(uint256) external returns (uint256);

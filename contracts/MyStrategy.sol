@@ -17,6 +17,8 @@ import "../interfaces/badger/IController.sol";
 
 import "../interfaces/erc20/Erc20.sol";
 import "../interfaces/compound/CErc20.sol";
+import "../interfaces/compound/Comptroller.sol";
+
 
 
 
@@ -42,6 +44,8 @@ contract MyStrategy is BaseStrategy {
     CErc20 cToken;
     uint256 exchangeRateMantissa;
     Erc20 underlying;
+
+    address public constant COMPTROLLER_ADDRESSS = 0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B;
    
     
 
@@ -77,6 +81,11 @@ contract MyStrategy is BaseStrategy {
 
         /// @dev do one off approvals here
         // IERC20Upgradeable(want).safeApprove(gauge, type(uint256).max);
+        IERC20Upgradeable(want).safeApprove(lpComponent, type(uint256).max); //approving WBTC for CWBTC contract
+        
+        IERC20Upgradeable(lpComponent).safeApprove(COMPTROLLER_ADDRESSS, type(uint256).max); //approving CWBTC for COMP
+
+
     }
 
 
@@ -193,8 +202,18 @@ contract MyStrategy is BaseStrategy {
 
         // Write your code here 
 
+        Comptroller comptroller = Comptroller(COMPTROLLER_ADDRESSS);
+        comptroller.claimComp(address(this));
+
+        uint256 rewardsAmount = IERC20Upgradeable(reward).balanceOf(address(this)); //how much comp we got
+
+
+
+
 
         uint256 earned = IERC20Upgradeable(want).balanceOf(address(this)).sub(_before);
+
+
 
         /// @notice Keep this in so you get paid!
         (uint256 governancePerformanceFee, uint256 strategistPerformanceFee) = _processPerformanceFees(earned);

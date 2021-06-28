@@ -7,8 +7,10 @@ pragma solidity ^0.6.11;
  * The ComptrollerInterface contract is available here
  * github.com/compound-finance/compound-protocol/blob/master/contracts/ComptrollerInterface.sol.
  */
-interface ComptrollerInterface {
+interface Comptroller {
 
     function claimComp(address) external;
+
+   
 
 }

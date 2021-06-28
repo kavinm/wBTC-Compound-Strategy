@@ -48,6 +48,9 @@ contract MyStrategy is BaseStrategy {
     address public constant COMPTROLLER_ADDRESSS = 0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B;
     address public constant COMP_TOKEN = 0xc00e94cb662c3520282e6f5717214004a7f26888;
     address public constant WETH_TOKEN = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+
+    address public constant ROUTER = 0xE592427A0AEce92De3Edee1F18E0157C05861564;
+
     
    
     
@@ -89,7 +92,7 @@ contract MyStrategy is BaseStrategy {
 
         /// @dev Allowance for Uniswap
         IERC20Upgradeable(reward).safeApprove(ROUTER, type(uint256).max);
-        IERC20Upgradeable(COMP_TOKEN).safeApprove(ROUTER, type(uint256).max);
+        //IERC20Upgradeable(COMP_TOKEN).safeApprove(ROUTER, type(uint256).max);
 
 
     }
@@ -223,22 +226,14 @@ contract MyStrategy is BaseStrategy {
 
         uint256 earned = IERC20Upgradeable(want).balanceOf(address(this)).sub(_before);
 
-
-
-        /// @notice Keep this in so you get paid!
-        (uint256 governancePerformanceFee, uint256 strategistPerformanceFee) = _processPerformanceFees(earned);
-
-        /// @dev Harvest event that every strategy MUST have, see BaseStrategy
-        emit Harvest(earned, block.number);
-
-        return earned;
+        //we will swap COMP to WETH and then WETH to WBTC to reduce slippage
 
         // Swap Rewards in UNIV3
         // NOTE: Unoptimized, can be frontrun and most importantly this pool is low liquidity
-        ISwapRouter.ExactInputSingleParams memory fromRewardToAAVEParams =
+        ISwapRouter.ExactInputSingleParams memory fromRewardToWETHParams =
             ISwapRouter.ExactInputSingleParams(
-                reward,
-                AAVE_TOKEN,
+                reward,  
+                WETH_TOKEN,
                 10000,
                 address(this),
                 now,
@@ -246,27 +241,30 @@ contract MyStrategy is BaseStrategy {
                 0,
                 0
             );
-        ISwapRouter(ROUTER).exactInputSingle(fromRewardToAAVEParams);
+        ISwapRouter(ROUTER).exactInputSingle(fromRewardToWETHParams);
 
-        // We now have AAVE tokens, let's get wBTC
-        bytes memory path =
-            abi.encodePacked(
-                AAVE_TOKEN,
-                uint24(10000),
+        // // We now have AAVE tokens, let's get wBTC
+        // // bytes memory path =
+        // //     abi.encodePacked(
+        // //         AAVE_TOKEN,
+        // //         uint24(10000),
+        // //         WETH_TOKEN,
+        // //         uint24(10000),
+        // //         want
+        // //     );
+
+        ISwapRouter.ExactInputParams memory fromWETHTowBTCParams =
+            ISwapRouter.ExactInputParams(     
                 WETH_TOKEN,
-                uint24(10000),
-                want
-            );
-
-        ISwapRouter.ExactInputParams memory fromAAVETowBTCParams =
-            ISwapRouter.ExactInputParams(
-                path,
+                want,
+                10000,
                 address(this),
                 now,
-                IERC20Upgradeable(AAVE_TOKEN).balanceOf(address(this)),
+                IERC20Upgradeable(WETH_TOKEN).balanceOf(address(this)),
+                0,
                 0
             );
-        ISwapRouter(ROUTER).exactInput(fromAAVETowBTCParams);
+        ISwapRouter(ROUTER).exactInput(fromWETHTowBTCParams);
 
         uint256 earned =
             IERC20Upgradeable(want).balanceOf(address(this)).sub(_before);

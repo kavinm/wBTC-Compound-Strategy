@@ -46,7 +46,8 @@ contract MyStrategy is BaseStrategy {
     Erc20 underlying;
 
     address public constant COMPTROLLER_ADDRESSS = 0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B;
-   
+    address public constant COMP_TOKEN = 0xc00e94cb662c3520282e6f5717214004a7f26888;
+    address public constant WETH_TOKEN = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     
 
     function initialize(
@@ -82,8 +83,11 @@ contract MyStrategy is BaseStrategy {
         /// @dev do one off approvals here
         // IERC20Upgradeable(want).safeApprove(gauge, type(uint256).max);
         IERC20Upgradeable(want).safeApprove(lpComponent, type(uint256).max); //approving WBTC for CWBTC contract
-        
         IERC20Upgradeable(lpComponent).safeApprove(COMPTROLLER_ADDRESSS, type(uint256).max); //approving CWBTC for COMP
+
+        /// @dev Allowance for Uniswap
+        IERC20Upgradeable(reward).safeApprove(ROUTER, type(uint256).max);
+        IERC20Upgradeable(COMP_TOKEN).safeApprove(ROUTER, type(uint256).max);
 
 
     }
@@ -222,7 +226,7 @@ contract MyStrategy is BaseStrategy {
         emit Harvest(earned, block.number);
 
         return earned;
-        
+
         // Swap Rewards in UNIV3
         // NOTE: Unoptimized, can be frontrun and most importantly this pool is low liquidity
         ISwapRouter.ExactInputSingleParams memory fromRewardToAAVEParams =

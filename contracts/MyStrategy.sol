@@ -18,6 +18,7 @@ import "../interfaces/badger/IController.sol";
 import "../interfaces/erc20/Erc20.sol";
 import "../interfaces/compound/CErc20.sol";
 import "../interfaces/compound/Comptroller.sol";
+import "../interfaces/uniswap/ISwapRouter.sol";
 
 
 
@@ -46,7 +47,7 @@ contract MyStrategy is BaseStrategy {
     Erc20 underlying;
 
     address public constant COMPTROLLER_ADDRESSS = 0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B;
-    address public constant COMP_TOKEN = 0xc00e94cb662c3520282e6f5717214004a7f26888;
+    //address public constant COMP_TOKEN = 0xc00e94cb662c3520282e6f5717214004a7f26888;
     address public constant WETH_TOKEN = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
     address public constant ROUTER = 0xE592427A0AEce92De3Edee1F18E0157C05861564;
@@ -220,12 +221,6 @@ contract MyStrategy is BaseStrategy {
             return 0;
         }
 
-
-
-
-
-        uint256 earned = IERC20Upgradeable(want).balanceOf(address(this)).sub(_before);
-
         //we will swap COMP to WETH and then WETH to WBTC to reduce slippage
 
         // Swap Rewards in UNIV3
@@ -253,8 +248,8 @@ contract MyStrategy is BaseStrategy {
         // //         want
         // //     );
 
-        ISwapRouter.ExactInputParams memory fromWETHTowBTCParams =
-            ISwapRouter.ExactInputParams(     
+        ISwapRouter.ExactInputSingleParams memory fromWETHTowBTCParams =
+            ISwapRouter.ExactInputSingleParams(     
                 WETH_TOKEN,
                 want,
                 10000,
@@ -264,7 +259,7 @@ contract MyStrategy is BaseStrategy {
                 0,
                 0
             );
-        ISwapRouter(ROUTER).exactInput(fromWETHTowBTCParams);
+        ISwapRouter(ROUTER).exactInputSingle(fromWETHTowBTCParams);
 
         uint256 earned =
             IERC20Upgradeable(want).balanceOf(address(this)).sub(_before);
@@ -278,11 +273,11 @@ contract MyStrategy is BaseStrategy {
 
         return earned;
     }
-    }
+    
 
-    // Alternative Harvest with Price received from harvester, used to avoid exessive front-running
+    //Alternative Harvest with Price received from harvester, used to avoid exessive front-running
     function harvest(uint256 price) external whenNotPaused returns (uint256 harvested) {
-
+            return 0; //no implementation for now
     }
 
     /// @dev Rebalance, Compound or Pay off debt here

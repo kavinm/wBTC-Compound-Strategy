@@ -46,7 +46,8 @@ contract MyStrategy is BaseStrategy {
     Erc20 underlying;
 
     address public constant COMPTROLLER_ADDRESSS = 0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B;
-
+    address public constant COMP_TOKEN = 0xc00e94cb662c3520282e6f5717214004a7f26888;
+    address public constant WETH_TOKEN = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     
    
     

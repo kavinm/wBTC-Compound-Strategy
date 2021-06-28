@@ -189,18 +189,18 @@ contract MyStrategy is BaseStrategy {
 
     /// @dev utility function to withdraw everything for migration
     function _withdrawAll() internal override {
-        // cToken.redeem(balanceOfPool());
+        cToken.redeem(balanceOfPool());
     }
 
 
     /// @dev withdraw the specified amount of want, liquidate from lpComponent to want, paying off any necessary debt for the conversion
     function _withdrawSome(uint256 _amount) internal override returns (uint256) {
 
-        // if (_amount > balanceOfPool()) { 
-        //     _amount = balanceOfPool();
-        // }
+        if (_amount > balanceOfPool()) { 
+            _amount = balanceOfPool();
+        }
         
-        // cToken.redeemUnderlying(_amount);
+        cToken.redeemUnderlying(_amount);
         return _amount;
     }
 

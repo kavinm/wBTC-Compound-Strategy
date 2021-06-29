@@ -13,10 +13,13 @@ import "../deps/@openzeppelin/contracts-upgradeable/math/MathUpgradeable.sol";
 import "../deps/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "../deps/@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol";
 
+import "../deps/@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "../deps/@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
 import "../interfaces/badger/IController.sol";
 
 import "../interfaces/erc20/Erc20.sol";
-import "../interfaces/compound/CErc20.sol";
+import "../interfaces/compound/CTokenInterface.sol";
 import "../interfaces/compound/Comptroller.sol";
 import "../interfaces/uniswap/ISwapRouter.sol";
 
@@ -36,15 +39,16 @@ contract MyStrategy is BaseStrategy {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     using AddressUpgradeable for address;
     using SafeMathUpgradeable for uint256;
+    
 
     event MyLog(string, uint);
 
    // address public want; // Inherited from BaseStrategy, the token the strategy wants, swaps into and tries to grow
     address public lpComponent; // Token we provide liquidity with
     address public reward; // Token we farm and swap to want / lpComponent
-    CErc20 cToken;
+    CTokenInterface cToken; //cWBTC object
     
-    Erc20 underlying;
+    IERC20Upgradeable underlying; // ERC20 compliant wBTC object
 
     address public constant COMPTROLLER_ADDRESSS = 0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B;
     //address public constant COMP_TOKEN = 0xc00e94cb662c3520282e6f5717214004a7f26888;
@@ -80,16 +84,17 @@ contract MyStrategy is BaseStrategy {
         performanceFeeStrategist = _feeConfig[1];
         withdrawalFee = _feeConfig[2];
 
-       cToken = CErc20(lpComponent); //cToken object for cwBTC
+        cToken = CTokenInterface(lpComponent); //cToken object for cwBTC
 
          
 
-         underlying = Erc20(want); //Erc20 object for wBTC
+        underlying = IERC20Upgradeable(want); //Erc20 object for wBTC
 
         /// @dev do one off approvals here
         // IERC20Upgradeable(want).safeApprove(gauge, type(uint256).max);
         IERC20Upgradeable(want).safeApprove(lpComponent, type(uint256).max); //approving WBTC for CWBTC contract
-        IERC20Upgradeable(lpComponent).safeApprove(COMPTROLLER_ADDRESSS, type(uint256).max); //approving CWBTC for COMP
+        
+        //CErc20(lpComponent).safeApprove(COMPTROLLER_ADDRESSS, type(uint256).max); //approving CWBTC for COMP
 
         /// @dev Allowance for Uniswap
         IERC20Upgradeable(reward).safeApprove(ROUTER, type(uint256).max);

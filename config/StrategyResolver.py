@@ -84,10 +84,10 @@ class StrategyResolver(StrategyCoreResolver):
         (Strategy Must Implement)
         """
         # E.G
-        # strategy = self.manager.strategy
-        # return {
-        #     "gauge": strategy.gauge(),
-        #     "mintr": strategy.mintr(),
-        # }
+        strategy = self.manager.strategy
+        return {
+            # "gauge": strategy.gauge(),
+            "lpComponent": strategy.lpComponent(),
+        }
 
         return {}

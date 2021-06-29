@@ -287,7 +287,7 @@ contract MyStrategy is BaseStrategy {
 
         uint256 toDeposit = balanceOfWant();
         
-        if(toDeposit != 0){
+        if(toDeposit > 0){
             underlying.approve(lpComponent, toDeposit);
             uint mintResult = cToken.mint(toDeposit);
 

@@ -11,6 +11,6 @@ interface Comptroller {
 
     function claimComp(address) external;
 
-    function claimComp(address, CToken[] memory) public
+    function claimComp(address, uint) external;
 
 }

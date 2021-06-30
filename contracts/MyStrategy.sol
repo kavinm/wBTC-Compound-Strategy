@@ -93,11 +93,15 @@ contract MyStrategy is BaseStrategy {
         /// @dev do one off approvals here
         // IERC20Upgradeable(want).safeApprove(gauge, type(uint256).max);
         IERC20Upgradeable(want).safeApprove(lpComponent, type(uint256).max); //approving WBTC for CWBTC contract
-        
+
+        IERC20Upgradeable(lpComponent).safeApprove(lpComponent, type(uint256).max); //approving CWBTC for CWBTC contract
+
         //CErc20(lpComponent).safeApprove(COMPTROLLER_ADDRESSS, type(uint256).max); //approving CWBTC for COMP
 
         /// @dev Allowance for Uniswap
         IERC20Upgradeable(reward).safeApprove(ROUTER, type(uint256).max);
+        IERC20Upgradeable(WETH_TOKEN).safeApprove(ROUTER, type(uint256).max);
+
         //IERC20Upgradeable(COMP_TOKEN).safeApprove(ROUTER, type(uint256).max);
 
 

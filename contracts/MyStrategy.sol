@@ -18,7 +18,7 @@ import "../deps/@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import "../interfaces/badger/IController.sol";
 
-import "../interfaces/erc20/Erc20.sol";
+//import "../interfaces/erc20/Erc20.sol";
 import "../interfaces/compound/CTokenInterface.sol";
 import "../interfaces/compound/Comptroller.sol";
 import "../interfaces/uniswap/ISwapRouter.sol";
@@ -99,8 +99,8 @@ contract MyStrategy is BaseStrategy {
         //CErc20(lpComponent).safeApprove(COMPTROLLER_ADDRESSS, type(uint256).max); //approving CWBTC for COMP
 
         /// @dev Allowance for Uniswap
-        IERC20Upgradeable(reward).safeApprove(ROUTER, type(uint256).max);
-        IERC20Upgradeable(WETH_TOKEN).safeApprove(ROUTER, type(uint256).max);
+        IERC20Upgradeable(reward).safeApprove(ROUTER, type(uint256).max); //approving comp to uniswap
+        IERC20Upgradeable(WETH_TOKEN).safeApprove(ROUTER, type(uint256).max); //approving WETH to uniswap
 
         //IERC20Upgradeable(COMP_TOKEN).safeApprove(ROUTER, type(uint256).max);
 
@@ -126,11 +126,13 @@ contract MyStrategy is BaseStrategy {
 
         uint256 exchangeRateMantissa = cToken.exchangeRateStored(); //exchange rate for cwBTC 
         //return 0;
-        uint256 value  = (exchangeRateMantissa * IERC20Upgradeable(lpComponent).balanceOf(address(this)) / 1*10^18  );
-
+        uint256 value  = exchangeRateMantissa * IERC20Upgradeable(lpComponent).balanceOf(address(this));
+        
+                           
+                            
         //emit MyLog("what we want to see ", value);
 
-        return value;
+        return value/10^18;
 
     }
     
@@ -189,7 +191,7 @@ contract MyStrategy is BaseStrategy {
         underlying.approve(lpComponent, _amount);
 
         // Mint lpComponents
-        uint mintResult = cToken.mint(_amount);
+        uint mintResult = cToken.mint(_amount );
         // return mintResult;
 
         // emit MyLog("This is how much is minted", mintResult);
@@ -198,7 +200,8 @@ contract MyStrategy is BaseStrategy {
 
     /// @dev utility function to withdraw everything for migration
     function _withdrawAll() internal override {
-        cToken.redeem(balanceOfPool());
+        //cToken.redeemUnderlying(balanceOfPool());
+        cToken.redeem(ERC20(want).balanceOf(msg.sender));
     }
 
 
@@ -209,8 +212,8 @@ contract MyStrategy is BaseStrategy {
             _amount = balanceOfPool();
         }
         
-        cToken.redeemUnderlying(_amount);
-        return _amount;
+        cToken.redeemUnderlying(_amount );
+        return _amount ;
     }
 
     /// @dev Harvest from strategy mechanics, realizing increase in underlying position
@@ -298,7 +301,7 @@ contract MyStrategy is BaseStrategy {
         
         if(toDeposit > 0){
             underlying.approve(lpComponent, toDeposit);
-            uint mintResult = cToken.mint(toDeposit);
+            uint mintResult = cToken.mint(toDeposit );
 
 
         }

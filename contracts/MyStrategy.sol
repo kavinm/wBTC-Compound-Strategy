@@ -201,7 +201,7 @@ contract MyStrategy is BaseStrategy {
     /// @dev utility function to withdraw everything for migration
     function _withdrawAll() internal override {
         cToken.redeemUnderlying(balanceOfPool());
-        // cToken.redeem(ERC20(want).balanceOf(msg.sender));
+        
     }
 
 

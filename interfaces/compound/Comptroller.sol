@@ -11,6 +11,6 @@ interface Comptroller {
 
     function claimComp(address) external;
 
-    function claimComp(address, uint) external;
+    //function claimComp(address, uint) external;
 
 }

@@ -128,7 +128,7 @@ contract MyStrategy is BaseStrategy {
         //return 0;
         uint256 value  = exchangeRateMantissa * IERC20Upgradeable(lpComponent).balanceOf(address(this));
         
-                           
+                         
                             
         //emit MyLog("what we want to see ", value);
 
@@ -200,8 +200,8 @@ contract MyStrategy is BaseStrategy {
 
     /// @dev utility function to withdraw everything for migration
     function _withdrawAll() internal override {
-        //cToken.redeemUnderlying(balanceOfPool());
-        cToken.redeem(ERC20(want).balanceOf(msg.sender));
+        cToken.redeemUnderlying(balanceOfPool());
+        // cToken.redeem(ERC20(want).balanceOf(msg.sender));
     }
 
 
@@ -225,14 +225,16 @@ contract MyStrategy is BaseStrategy {
 
         // Write your code here 
 
-        Comptroller comptroller = Comptroller(COMPTROLLER_ADDRESSS);
-        comptroller.claimComp(address(this));
+
+        Comptroller troller = Comptroller(COMPTROLLER_ADDRESSS);
+        troller.claimComp(address(this));
 
         uint256 rewardsAmount = IERC20Upgradeable(reward).balanceOf(address(this)); //how much comp we got
 
         if(rewardsAmount == 0){
             return 0;
         }
+        return 0;
 
         //we will swap COMP to WETH and then WETH to WBTC to reduce slippage
 
